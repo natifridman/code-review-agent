@@ -1,0 +1,38 @@
+# Virtual environments
+test_env/
+venv/
+env/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test outputs
+test_results/
+coverage/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# GitHub Action artifacts
+github-event.json

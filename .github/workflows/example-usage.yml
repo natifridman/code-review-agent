@@ -1,0 +1,46 @@
+name: AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  ai-code-review:
+    runs-on: ubuntu-latest
+    name: AI Code Review
+    
+    permissions:
+      contents: read
+      pull-requests: write
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Build and Run AI Code Review
+        run: |
+          # Build the container from Containerfile
+          docker build -f Containerfile -t code-review-action:latest .
+          
+          # Run the code review container
+          docker run --rm \
+            -e GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" \
+            -e GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
+            -e GITHUB_REPOSITORY="${{ github.repository }}" \
+            -e GITHUB_EVENT_PATH="/github/workflow/event.json" \
+            -e GITHUB_SHA="${{ github.sha }}" \
+            -e GITHUB_REF="${{ github.ref }}" \
+            -e MAX_FILES="20" \
+            -e REVIEW_LEVEL="standard" \
+            -e ENABLE_SECURITY_ANALYSIS="true" \
+            -e ENABLE_PERFORMANCE_ANALYSIS="true" \
+            -e ENABLE_DOCUMENTATION_REVIEW="true" \
+            -e ENABLE_LINE_COMMENTS="true" \
+            -e ENABLE_PR_SUMMARY="true" \
+            -e MAX_FILE_SIZE_KB="500" \
+            -v "${{ github.event_path }}:/github/workflow/event.json" \
+            -v "${{ github.workspace }}:/github/workspace" \
+            -w /github/workspace \
+            code-review-action:latest

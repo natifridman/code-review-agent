@@ -1,0 +1,50 @@
+name: 'AI Code Review'
+description: 'Automated code review using CrewAI and Gemini API'
+author: 'Code Review Agent'
+
+inputs:
+  gemini_api_key:
+    description: 'Gemini API key for LLM access'
+    required: true
+  github_token:
+    description: 'GitHub token for API access'
+    required: true
+    default: ${{ github.token }}
+  max_files:
+    description: 'Maximum number of files to review'
+    required: false
+    default: '20'
+  review_level:
+    description: 'Review depth: basic, standard, comprehensive'
+    required: false
+    default: 'standard'
+  exclude_patterns:
+    description: 'Comma-separated patterns to exclude from review'
+    required: false
+    default: '*.lock,*.min.js,*.bundle.js,node_modules/**'
+
+outputs:
+  review_summary:
+    description: 'Summary of the code review results'
+  issues_found:
+    description: 'Number of issues found'
+  recommendations:
+    description: 'Key recommendations from the review'
+
+runs:
+  using: 'docker'
+  image: './Containerfile'
+  env:
+    GEMINI_API_KEY: ${{ inputs.gemini_api_key }}
+    GITHUB_TOKEN: ${{ inputs.github_token }}
+    MAX_FILES: ${{ inputs.max_files }}
+    REVIEW_LEVEL: ${{ inputs.review_level }}
+    EXCLUDE_PATTERNS: ${{ inputs.exclude_patterns }}
+    GITHUB_REPOSITORY: ${{ github.repository }}
+    GITHUB_EVENT_PATH: ${{ github.event_path }}
+    GITHUB_SHA: ${{ github.sha }}
+    GITHUB_REF: ${{ github.ref }}
+
+branding:
+  icon: 'eye'
+  color: 'blue'
